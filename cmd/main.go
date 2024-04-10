@@ -1,13 +1,27 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/Hua-Meng14/go-jwt/handlers"
+	"github.com/Hua-Meng14/go-jwt/middleware"
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
-    app := fiber.New()
+	r := gin.Default()
 
-    app.Get("/", func(c *fiber.Ctx) error {
-        return c.SendString("Hello, Div Rhino!")
-    })
+	// Public routes (do not require authentication)
+	publicRoutes := r.Group("/public")
+	{
+		publicRoutes.POST("/login", handlers.Login)
+		publicRoutes.POST("/register", handlers.Register)
+	}
 
-    app.Listen(":3000")
+	// Protected routes (require authentication)
+	protectedRoutes := r.Group("/protected")
+	protectedRoutes.Use(middleware.AuthenticationMiddleware())
+	{
+		// Protected routes here
+	}
+
+	r.Run(":8080")
 }
